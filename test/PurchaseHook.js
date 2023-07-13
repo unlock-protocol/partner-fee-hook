@@ -13,6 +13,9 @@ describe("PurchaseHook", function () {
     console.log(
       `Owner: ${owner.address}\nRecipient: ${user.address}\nRefer: ${refer.address}`
     );
+
+    console.log("Lock address", lock.address);
+
     // Deploy a lock
     const { lock } = await unlock.createLock({
       expirationDuration: 60 * 60 * 24 * 7,
