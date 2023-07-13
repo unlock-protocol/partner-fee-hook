@@ -64,4 +64,13 @@ contract PurchaseHook {
         // Do nothing
         setReferal(recipient, referrer, 1);
     }
+
+    function onKeyExtend(
+        uint256 /* _tokenId*/,
+        address /* from */,
+        uint256 /* newTimestamp */,
+        uint256 /* old expirationTimestamp */
+    ) {
+        // No-op
+    }
 }
