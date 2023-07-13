@@ -25,24 +25,6 @@ describe("PurchaseHook", function () {
     await hook.deployed();
     console.log("Hook address", hook.address);
 
-
-    console.log("Lock address", lock.address);
-    console.log("user is manager? address", await lock.isLockManager(user.address));
-    console.log("owner is manager? address", await lock.isLockManager(owner.address));
-    console.log("refer is manager? address", await lock.isLockManager(refer.address));
-
-    // Attach the hook to our lock
-    // You will also need to set the hook address fot renewals, right?
-    console.log(await lock.onKeyPurchaseHook())
-    console.log(await lock.onKeyCancelHook())
-    console.log(await lock.onValidKeyHook())
-    console.log(await lock.onTokenURIHook())
-    console.log(await lock.onKeyTransferHook())
-    console.log(await lock.onKeyExtendHook())
-    console.log(await lock.onKeyGrantHook())
-    console.log(await lock.onKeyGrantHook())
-
-
     await (
       await lock.setEventHooks(
         hook.address, // _onKeyPurchaseHook
@@ -50,7 +32,7 @@ describe("PurchaseHook", function () {
         ethers.constants.AddressZero, // _onValidKeyHook
         ethers.constants.AddressZero, // _onTokenURIHook
         ethers.constants.AddressZero, // _onKeyTransferHook
-        ethers.constants.AddressZero, // _onKeyExtendHook
+        hook.address, // _onKeyExtendHook
         ethers.constants.AddressZero  // _onKeyGrantHook
       )
     ).wait();
