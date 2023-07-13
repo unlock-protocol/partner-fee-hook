@@ -8,6 +8,9 @@ describe("PurchaseHook", function () {
 
   it("should set refer on purchase", async () => {
     const [user, owner, refer] = await ethers.getSigners();
+    console.log(
+      `Owner: ${owner.address}\nRecipient: ${user.address}\nRefer: ${refer.address}`
+    );
     // Deploy a lock
     const { lock } = await unlock.createLock({
       expirationDuration: 60 * 60 * 24 * 7,
@@ -37,14 +40,15 @@ describe("PurchaseHook", function () {
         ethers.constants.AddressZero
       )
     ).wait();
+    console.log("Hook attached to lock");
 
     await (await lock.addLockManager(hook.address)).wait();
+    console.log("Hook added as lock manager");
 
     // And now make a purchase
     expect(lock.address).to.be.properAddress;
     expect(hook.address).to.be.properAddress;
 
-    console.log(user.address, owner.address, refer.address);
     await (
       await lock.purchase(
         [0],
