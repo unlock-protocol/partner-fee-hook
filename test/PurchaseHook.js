@@ -2,27 +2,26 @@ const { expect } = require("chai");
 const { ethers, unlock } = require("hardhat");
 
 describe("PurchaseHook", function () {
-  let lock;
-  let hook;
   before(async () => {
-    const [user, owner, refer] = await ethers.getSigners();
-    // Deploy the core Unlock protocol
     await unlock.deployProtocol();
+  });
+
+  it("should set refer on purchase", async () => {
+    const [user, owner, refer] = await ethers.getSigners();
     // Deploy a lock
-    const result = await unlock.createLock({
+    const { lock } = await unlock.createLock({
       expirationDuration: 60 * 60 * 24 * 7,
       maxNumberOfKeys: 100,
-      keyPrice: 0,
+      keyPrice: 1,
       beneficiary: owner.address,
       name: "My NFT membership contract",
     });
-    lock = result.lock;
 
     console.log("Lock address", lock.address);
 
     // Deploy the hook
     const PurchaseHook = await ethers.getContractFactory("PurchaseHook");
-    hook = await PurchaseHook.deploy();
+    const hook = await PurchaseHook.deploy();
     await hook.deployed();
     console.log("Hook address", hook.address);
 
@@ -35,16 +34,16 @@ describe("PurchaseHook", function () {
         ethers.constants.AddressZero,
         ethers.constants.AddressZero,
         ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
+        ethers.constants.AddressZero
       )
     ).wait();
 
     await (await lock.addLockManager(hook.address)).wait();
-      
+
     // And now make a purchase
     expect(lock.address).to.be.properAddress;
     expect(hook.address).to.be.properAddress;
-    
+
     console.log(user.address, owner.address, refer.address);
     await (
       await lock.purchase(
@@ -57,17 +56,7 @@ describe("PurchaseHook", function () {
       )
     ).wait();
 
-  });
-
-
-
-  it('should set refer on purchase', async () => {
-    
-
     const referals = await hook.referals(user.address);
     console.log(referals);
   });
-
-  
-
 });
