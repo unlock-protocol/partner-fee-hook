@@ -15,12 +15,9 @@ describe("PurchaseHook", function () {
     const { lock } = await unlock.createLock({
       expirationDuration: 60 * 60 * 24 * 7,
       maxNumberOfKeys: 100,
-      keyPrice: 1,
-      beneficiary: owner.address,
+      keyPrice: 0,
       name: "My NFT membership contract",
     });
-
-    console.log("Lock address", lock.address);
 
     // Deploy the hook
     const PurchaseHook = await ethers.getContractFactory("PurchaseHook");
@@ -28,16 +25,33 @@ describe("PurchaseHook", function () {
     await hook.deployed();
     console.log("Hook address", hook.address);
 
+
+    console.log("Lock address", lock.address);
+    console.log("user is manager? address", await lock.isLockManager(user.address));
+    console.log("owner is manager? address", await lock.isLockManager(owner.address));
+    console.log("refer is manager? address", await lock.isLockManager(refer.address));
+
     // Attach the hook to our lock
+    // You will also need to set the hook address fot renewals, right?
+    console.log(await lock.onKeyPurchaseHook())
+    console.log(await lock.onKeyCancelHook())
+    console.log(await lock.onValidKeyHook())
+    console.log(await lock.onTokenURIHook())
+    console.log(await lock.onKeyTransferHook())
+    console.log(await lock.onKeyExtendHook())
+    console.log(await lock.onKeyGrantHook())
+    console.log(await lock.onKeyGrantHook())
+
+
     await (
       await lock.setEventHooks(
-        hook.address, // The first address is the onKeyPurchase hook
-        ethers.constants.AddressZero, // Other non-used hooks
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero, // _onKeyPurchaseHook
+        ethers.constants.AddressZero, // _onKeyCancelHook
+        ethers.constants.AddressZero, // _onValidKeyHook
+        ethers.constants.AddressZero, // _onTokenURIHook
+        ethers.constants.AddressZero, // _onKeyTransferHook
+        ethers.constants.AddressZero, // _onKeyExtendHook
+        ethers.constants.AddressZero  // _onKeyGrantHook
       )
     ).wait();
     console.log("Hook attached to lock");
@@ -49,6 +63,7 @@ describe("PurchaseHook", function () {
     expect(lock.address).to.be.properAddress;
     expect(hook.address).to.be.properAddress;
 
+    console.log('Ready for purchase')
     await (
       await lock.purchase(
         [0],
