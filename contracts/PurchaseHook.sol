@@ -52,7 +52,8 @@ contract PurchaseHook {
      * purchase function fails.
      */
     function onKeyPurchase(
-        address /*from*/,
+        uint256 /* tokenId */,
+        address /* from */,
         address recipient,
         address referrer,
         bytes calldata /*data*/,

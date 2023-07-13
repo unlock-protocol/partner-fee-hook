@@ -45,7 +45,7 @@ describe("PurchaseHook", function () {
 
     await (
       await lock.setEventHooks(
-        ethers.constants.AddressZero, // _onKeyPurchaseHook
+        hook.address, // _onKeyPurchaseHook
         ethers.constants.AddressZero, // _onKeyCancelHook
         ethers.constants.AddressZero, // _onValidKeyHook
         ethers.constants.AddressZero, // _onTokenURIHook
