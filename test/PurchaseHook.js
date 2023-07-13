@@ -1,6 +1,8 @@
 const { expect } = require("chai");
 const { ethers, unlock } = require("hardhat");
 
+const keyPrice = 10000
+
 describe("PurchaseHook", function () {
   before(async () => {
     await unlock.deployProtocol();
@@ -15,7 +17,7 @@ describe("PurchaseHook", function () {
     const { lock } = await unlock.createLock({
       expirationDuration: 60 * 60 * 24 * 7,
       maxNumberOfKeys: 100,
-      keyPrice: 0,
+      keyPrice,
       name: "My NFT membership contract",
     });
 
@@ -53,7 +55,7 @@ describe("PurchaseHook", function () {
         [owner.address], // key manager
         [refer.address], // refer
         [[]],
-        { value: 0 }
+        { value: keyPrice }
       )
     ).wait();
 
