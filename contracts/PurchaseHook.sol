@@ -52,7 +52,8 @@ contract PurchaseHook {
      * purchase function fails.
      */
     function onKeyPurchase(
-        address /*from*/,
+        uint256 /* tokenId */,
+        address /* from */,
         address recipient,
         address referrer,
         bytes calldata /*data*/,
@@ -62,5 +63,14 @@ contract PurchaseHook {
         console.log("onKeyPurchase");
         // Do nothing
         setReferal(recipient, referrer, 1);
+    }
+
+    function onKeyExtend(
+        uint256 /* _tokenId*/,
+        address /* from */,
+        uint256 /* newTimestamp */,
+        uint256 /* old expirationTimestamp */
+    ) {
+        // No-op
     }
 }
