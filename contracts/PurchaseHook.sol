@@ -5,28 +5,30 @@ import "@unlock-protocol/contracts/dist/PublicLock/IPublicLockV13.sol";
 import "hardhat/console.sol";
 
 contract PurchaseHook {
-    struct Referal {
-        address referrer;
-        uint256 amount;
-    }
-
-    mapping(address => Referal) public referals;
+    mapping(address => address payable) public referals;
+    mapping(address => uint256) public referalAmounts;
 
     /** Constructor */
     constructor() {}
 
     // set referal
-    function setReferal(
-        address _recipient,
-        address _referrer,
-        uint256 _amount
-    ) public {
-        referals[_recipient] = Referal(_referrer, _amount);
+    function setReferal(address _recipient, address payable _referrer) public {
+        referals[_recipient] = _referrer;
     }
 
     // get referal
-    function getReferal(address _user) public view returns (Referal memory) {
+    function getReferal(address _user) public view returns (address payable) {
         return referals[_user];
+    }
+
+    // get referal amount
+    function getReferalAmount(address _referr) public view returns (uint256) {
+        return referalAmounts[_referr];
+    }
+
+    // set referal amount
+    function setReferalAmount(address _referr, uint256 _amount) public {
+        referalAmounts[_referr] = _amount;
     }
 
     /**
@@ -55,22 +57,29 @@ contract PurchaseHook {
         uint256 /* tokenId */,
         address /* from */,
         address recipient,
-        address referrer,
+        address payable referrer,
         bytes calldata /*data*/,
         uint256 /*minKeyPrice*/,
         uint256 /*pricePaid*/
     ) external {
         console.log("onKeyPurchase");
         // Do nothing
-        setReferal(recipient, referrer, 1);
+        setReferal(recipient, referrer);
+        console.log("referrer", referrer);
+        IPublicLockV13(msg.sender).withdraw(msg.sender, referrer, 1000);
     }
 
     function onKeyExtend(
         uint256 /* _tokenId*/,
-        address /* from */,
+        address from,
         uint256 /* newTimestamp */,
         uint256 /* old expirationTimestamp */
-    ) {
+    ) external {
         // No-op
+        console.log("onKeyExtend");
+        uint256 price = IPublicLockV13(msg.sender).keyPrice();
+        console.log("price", price);
+        address payable referrer = getReferal(from);
+        IPublicLockV13(msg.sender).withdraw(msg.sender, referrer, 1000);
     }
 }

@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers, unlock } = require("hardhat");
 
-const keyPrice = 10000
+const keyPrice = 10000;
 
 describe("PurchaseHook", function () {
   before(async () => {
@@ -14,8 +14,6 @@ describe("PurchaseHook", function () {
       `Owner: ${owner.address}\nRecipient: ${user.address}\nRefer: ${refer.address}`
     );
 
-    console.log("Lock address", lock.address);
-
     // Deploy a lock
     const { lock } = await unlock.createLock({
       expirationDuration: 60 * 60 * 24 * 7,
@@ -23,6 +21,8 @@ describe("PurchaseHook", function () {
       keyPrice,
       name: "My NFT membership contract",
     });
+
+    console.log("Lock address", lock.address);
 
     // Deploy the hook
     const PurchaseHook = await ethers.getContractFactory("PurchaseHook");
@@ -38,7 +38,7 @@ describe("PurchaseHook", function () {
         ethers.constants.AddressZero, // _onTokenURIHook
         ethers.constants.AddressZero, // _onKeyTransferHook
         hook.address, // _onKeyExtendHook
-        ethers.constants.AddressZero  // _onKeyGrantHook
+        ethers.constants.AddressZero // _onKeyGrantHook
       )
     ).wait();
     console.log("Hook attached to lock");
@@ -50,7 +50,7 @@ describe("PurchaseHook", function () {
     expect(lock.address).to.be.properAddress;
     expect(hook.address).to.be.properAddress;
 
-    console.log('Ready for purchase')
+    console.log("Ready for purchase");
     await (
       await lock.purchase(
         [0],
@@ -62,7 +62,37 @@ describe("PurchaseHook", function () {
       )
     ).wait();
 
-    const referals = await hook.referals(user.address);
-    console.log(referals);
+    // getBalance = await refer.getBalance();
+
+    // console.log("Ready for renew");
+    // await (
+    //   await lock.extend(
+    //     0,
+    //     1, // tokenId
+    //     refer.address, // key refer
+    //     0 // refer
+    //   )
+    // ).wait();
   });
+
+  // it("should set refer manually", async () => {
+  //   const [user, owner, refer] = await ethers.getSigners();
+  //   console.log(
+  //     `Owner: ${owner.address}\nRecipient: ${user.address}\nRefer: ${refer.address}`
+  //   );
+  //   // Deploy the hook
+  //   const PurchaseHook = await ethers.getContractFactory("PurchaseHook");
+  //   const hook = await PurchaseHook.deploy();
+  //   await hook.deployed();
+  //   console.log("Hook address", hook.address);
+
+  //   hook.setReferal(user.address, refer.address);
+  //   hook.setReferalAmount(refer.address, 1000);
+  //   hook.getReferal(user.address).then((referal) => {
+  //     console.log(referal);
+  //   });
+  //   hook.getReferalAmount(refer.address).then((amount) => {
+  //     console.log(amount);
+  //   });
+  // });
 });
