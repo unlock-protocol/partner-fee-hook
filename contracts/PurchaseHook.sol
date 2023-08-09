@@ -17,11 +17,19 @@ contract PurchaseHook {
     }
 
     // set referal
-    function setReferrer(
+    function _setReferrer(
         address _recipient,
         address payable _referrer
     ) private {
         referals[_recipient] = _referrer;
+    }
+
+    // Overrides the referrer for a given recipient
+    function setReferrer(address _recipient, address payable _referrer) public {
+        if (!lock.isLockManager(msg.sender)) {
+            revert Unauthorized();
+        }
+        _setReferrer(_recipient, _referrer);
     }
 
     // set referal amount
@@ -72,7 +80,7 @@ contract PurchaseHook {
         // console.log(referalAmounts[referrer]);
 
         // Do nothing
-        setReferrer(recipient, referrer);
+        _setReferrer(recipient, referrer);
         address currency = lock.tokenAddress();
         lock.withdraw(currency, referrer, referalAmounts[referrer]); // Pay fee to referrer
     }

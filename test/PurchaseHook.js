@@ -125,6 +125,12 @@ describe("PurchaseHook", function () {
 
     expect(balancesAfterRenew.referrer).to.equal(balancesAfterPurchase.referrer.add(referrerAmount))
     expect(balancesAfterRenew.lock).to.equal(balancesAfterPurchase.lock.add(keyPrice).sub(referrerAmount))
+
+    // test setting a refferer
+    expect(await hook.referals(user.address)).to.equal(referrer.address)
+    await (await hook.setReferrer(user.address, ethers.constants.AddressZero)).wait();
+    expect(await hook.referals(user.address)).to.equal(ethers.constants.AddressZero)
+
   });
 
 });
